@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SocketCluster</title>
+    <link rel="icon" type="image/png" href="/favicon.ico">
+    <link rel="stylesheet" type="text/css" href="css/style.css">
+    <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
+</head>
+<body>
+<div class="container-fluid">
+    <div class="content">
+        <div class="title">
+            未连接 <small>--</small>
+        </div>
+        <div class="text">
+
+        </div>
+        <button id="stopSubcribe">停止订阅</button>
+        <button id="resetSubcribe">重新订阅</button>
+    </div>
+</div>
+<!--控制台调试-->
+<div class="navbar-fixed-bottom console-box" style="position: fixed">
+    <label class="control-label" for="console">Console</label><br><br>
+    <div class="col-md-12">
+        <ul id="console" class="console"></ul>
+    </div>
+</div>
+<script type="text/javascript" src="js/libs/jquery.min.js"></script>
+<script type="text/javascript" src="js/libs/bootstrap.min.js"></script>
+
+<script type="text/javascript" src="js/libs/socketcluster.min.js"></script>
+<script type="text/javascript" src="js/socketclient.js"></script>
+<script type="text/javascript" src="js/common.js"></script>
+<script type="text/javascript" src="js/index.js"></script>
+</body>
+</html>
