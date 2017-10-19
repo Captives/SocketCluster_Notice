@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style type="text/css">
+        #wrapper{
+            background: orangered;
+            width: 800px;
+            height: 600px;
+            position: absolute;
+        }
+
+        #wrapper.active{
+            width: 100%;
+            height:100%;
+        }
+    </style>
+</head>
+<body>
+<div id="content">
+    <a href='#' id='fsButton'>点击变全屏</a>
+    <div id="wrapper" class="wrapper">
+        <a href='#' id="cacalButton">取消</a>
+        <h1>//页面内容</h1>
+    </div>
+</div>
+
+<script type="text/javascript" src="/Public/js/jquery.min.1.7.2.js"></script>
+<script type="text/javascript" src="jquery.fullscreen.js"></script>
+<script type="text/javascript">
+var fullScreen = false;
+$(document).ready(function(){
+    $('#fsButton').click(function (e) {
+        $('#wrapper').fullScreen({
+            callback:function (isFullScreen) {
+                fullScreen = isFullScreen;
+                if(isFullScreen){
+                    $('#cacalButton').show();
+                    $('#wrapper').addClass('active');
+                }else{
+                    $('#cacalButton').hide();
+                    $('#wrapper').removeClass('active');
+                }
+                console.log(isFullScreen);
+            }
+        });
+        e.preventDefault();
+    });
+
+    $('#cacalButton').click(function (e) {
+        $('#wrapper').cancelFullScreen();
+        e.preventDefault();
+    });
+
+    $('#wrapper').dblclick(function (e) {
+        if(fullScreen){
+            $('#cacalButton').click();
+        }else{
+            $('#fsButton').click();
+        }
+    });
+})
+</script>
+</body>
+</html>

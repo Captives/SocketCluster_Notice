@@ -11,7 +11,6 @@ var environment = process.env.ENV || 'dev';
 var options = {
     workers: Number(argv.w) || Number(process.env.SOCKETCLUSTER_WORKERS) || 8,
     brokers: Number(argv.b) || Number(process.env.SOCKETCLUSTER_BROKERS) || 4,
-    // host:argv.host || '127.0.0.1',
     port: Number(argv.p) || Number(process.env.SOCKETCLUSTER_PORT) || 1443,
     //如果您的系统不支持“uws”，可以切换到'ws'（但工作在旧系统这是较慢的）。
     wsEngine: process.env.SOCKETCLUSTER_WS_ENGINE || 'uws',
