@@ -31,6 +31,20 @@
 <script type="text/javascript">
 var fullScreen = false;
 $(document).ready(function(){
+
+	function FullScreen(target){
+        var fullScreen = false;
+        if(fullScreen){
+            $(target).cancelFullScreen();
+        }else{
+            $(target).fullScreen({
+                callback:function (isFullScreen) {
+                    fullScreen = isFullScreen;
+                }
+            });
+        }
+    }
+	
     $('#fsButton').click(function (e) {
         $('#wrapper').fullScreen({
             callback:function (isFullScreen) {
