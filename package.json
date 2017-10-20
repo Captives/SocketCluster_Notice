@@ -11,7 +11,7 @@
   "dependencies": {
     "connect": "3.0.1",
     "express": "4.13.1",
-    "log4js": "^2.3.4",
+    "log4js": "^2.3.7",
     "minimist": "1.1.0",
     "morgan": "1.7.0",
     "sc-cluster-broker-client": "1.x.x",

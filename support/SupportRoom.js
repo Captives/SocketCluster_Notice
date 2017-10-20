@@ -2,6 +2,9 @@
  * Created by Administrator on 2017/4/28.
  * 表示归属每个房间对象
  */
+var log4js = require('./../conf/Logger');
+var console = log4js.getLogger();
+
 var EventEmitter = require('wolfy87-eventemitter');
 module.exports = UUABCOneRoom;
 function UUABCOneRoom(td) {

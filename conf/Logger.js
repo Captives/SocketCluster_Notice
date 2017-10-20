@@ -1,66 +1,153 @@
-/******************************* Logger *******************************/
-var log4js = require('log4js');
-log4js.configure({
+//线上日志的配置
+var logconfig = {
     appenders: {
-        console : {type: 'console', category:"console"},
-        stdout:{type : 'stdout'},
-        other:{type: 'file', filename: 'logs/other.log'},
-        index:{type: 'file', filename: 'logs/server.log'},
-        one:{type: 'console', filename: 'logs/one/console.log'},
-        many:{
-            type: 'console',
-            filename: 'logs/many/log',
-            alwaysIncludePattern: true,
-            pattern: "_yyyy_MM_ddhh.log"
-        },
-        live:{type: 'file', filename: 'logs/live/console.log'},
+        console: {type: 'console'},
+        stdout: {type: 'console'},
+        index: {type: 'console'},
+        one: {type: 'console'},
+        many: {type: 'console'},
+        live: {type: 'console'},
+        search: {type: 'console'},
+        other: {type: 'console'},
     },
     categories: {
-        // console: {appenders: ['console','other', 'index','many'], level: 'ALL'},
-        default: {appenders: ['other'], level: 'debug'},
         index: {appenders: ['index'], level: 'debug'},
         one: {appenders: ['one'], level: 'debug'},
         many: {appenders: ['many'], level: 'ALL'},
         live: {appenders: ['live'], level: 'debug'},
+        search: {appenders: ['search'], level: 'debug'},
+        default: {appenders: ['other'], level: 'debug'},
     },
     replaceConsole: true
-});
+};
 
-var getLogger = function (path) {
-    var logger = log4js.getLogger(path);
+/******************************* console *******************************/
+//自定义控制台输出
+function replaceConsole(logger, name) {
+    var path = require('path');
+    var stackInfo = function () {
+        var stackReg = /at\s+(.*)\s+\((.*):(\d*):(\d*)\)/i;
+        var stackReg2 = /at\s+()(.*):(\d*):(\d*)/i;
+        var stacklist = (new Error()).stack.split('\n').slice(3);
+        var s = stacklist[0];
+        var sp = stackReg.exec(s) || stackReg2.exec(s);
+        var data = {};
+        if (sp && sp.length === 5) {
+            data.method = sp[1];
+            data.path = sp[2];
+            data.line = sp[3];
+            data.pos = sp[4];
+            data.file = path.basename(data.path);
+        }
+        return data;
+    };
+
+    var Logger = {
+        log: logger.log,
+        info: logger.info,
+        warn: logger.warn,
+        error: logger.error,
+        fatal: logger.fatal,
+        includeTime: true,
+        includeLevel: true,
+        includeLabel: true,
+        includeMethod: false,
+        color: {
+            black: 30,//黑色
+            red: 31,//红色
+            green: 32,//绿色
+            yellow: 33,//黄色
+            blue: 34,//蓝色
+            pink: 35,//粉红
+            cyan: 36,//青色
+            gray: 37,//灰色
+        },
+        trace: function (level, stackInfo, code, arguments) {
+            var method = stackInfo['method'];
+            var file = stackInfo['file'];
+            var line = stackInfo['line'];
+
+            var arr = Array.prototype.slice.call(arguments);
+            arr.push('\033[0m');
+            if(['[WARN]','[ERROR]'].indexOf(level) == -1){
+                arr.unshift('\033[0;' + code + 'm');
+            }else{
+                arr.unshift('\033[1;' + code + 'm');
+            }
+            if (this.includeMethod) {
+                arr.unshift(method);//方法
+            }
+
+            if (this.includeLabel) {
+                arr.unshift(file + ':' + line);//文件和行号
+                arr.unshift(name + " -");
+            }
+
+            arr.unshift('\033[0;32m');
+            if (this.includeLevel) {
+                arr.unshift(level);//日志级别
+            }
+
+            if (this.includeTime) {
+                arr.unshift(new Date().toLocaleString());//日志级别
+            }
+
+            arr.unshift('\033[0;36m');
+
+            var text = arr.join(" ");
+            console.log(text);
+        }
+    };
+
+    logger.log = function () {
+        Logger.log.apply(logger, arguments);
+        Logger.trace("[LOG]", stackInfo(), Logger.color.black, arguments);
+    };
+
+    logger.info = function () {
+        Logger.info.apply(logger, arguments);
+        Logger.trace("[INFO]", stackInfo(), Logger.color.black, arguments);
+    };
+
+    logger.warn = function () {
+        Logger.warn.apply(logger, arguments);
+        Logger.trace("[WARN]", stackInfo(), Logger.color.yellow, arguments);
+    };
+
+    logger.error = function () {
+        Logger.error.apply(logger, arguments);
+        Logger.trace("[ERROR]", stackInfo(), Logger.color.red, arguments);
+    };
+
+    logger.fatal = function () {
+        Logger.fatal.apply(logger, arguments);
+        Logger.trace("[FATAL]", stackInfo(), Logger.color.pink, arguments);
+    };
+    
+    return Logger;
+}
+
+/******************************* Logger *******************************/
+var conf = require('./../conf/conf');
+var logAppenders = conf.logAppenders;
+var logStdout = conf.logStdout;
+logconfig.appenders = logAppenders || logconfig.appenders;
+
+var log4js = require('log4js');
+log4js.configure(logconfig);
+var getLogger = function (name) {
+    var logger = log4js.getLogger(name);
     logger.log = logger.info;
+    name = name || "default";
+
+    if(logStdout && logAppenders != null){
+        replaceConsole(logger, name);
+    }
     return logger;
 };
 
-
-
-/*
-var appenders = {};
-appenders.console = {type: 'console', category:"console"};
-appenders.other = {type: 'file', filename: 'logs/other.log'};
-appenders.index = {type: 'file', filename: 'logs/server.log'};
-appenders.one = {type: 'file', filename: 'logs/one/console.log'};
-
-appenders.many = {};
-appenders.many.type =  'console';
-appenders.many.filename = 'logs/many/log';
-appenders.many.alwaysIncludePattern = true;
-appenders.many.pattern = "_yyyy_MM_ddhh.log";
-
-appenders.live = {};
-appenders.live.type = 'file';
-appenders.live.filename = 'logs/live/console.log';
-
-var categories = {};
-categories.default = {appenders: ['other'], level: 'debug'};
-categories.index = {appenders: ['index'], level: 'debug'};
-categories.one = {appenders: ['one'], level: 'debug'};
-categories.many = {appenders: ['many'], level: 'ALL'};
-categories.live = {appenders: ['live'], level: 'debug'};
-*/
-
-
 module.exports = {
-    getLogger: getLogger
+    getLogger: getLogger,
+    replaceConsole:replaceConsole
 };
 /******************************* Logger END *******************************/

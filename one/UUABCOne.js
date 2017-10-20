@@ -11,6 +11,8 @@ function UUABCMany() {
     this.clients = {};
     //服务列表,指定房间的服务集合channel
     this.roomList = {};
+
+    console.log('一对一课程模块初始化完成');
 };
 
 /**
@@ -20,7 +22,7 @@ function UUABCMany() {
 UUABCMany.prototype.attach = function (socketServer) {
     var that = this;
     socketServer.on('connection', function (socket) {
-        socket.address = socket.remoteAddress.replace("::ffff:","");
+        socket.address = socket.handshake.address.replace("::ffff:", "");
         console.log("TD new socket", socket.id, socket.address);
         that.push(socket);
     });
@@ -46,7 +48,7 @@ UUABCMany.prototype.push = function (socket) {
     socket.on('login', function (data, response) {
         //获取指定通道号的服务, 如果没有创建一个新的
         var room = that.getRoomByTD(data.room);
-        if(!room){
+        if (!room) {
             room = new Room(data.room);
             that.roomList[room.td] = room;
         }
@@ -61,12 +63,12 @@ UUABCMany.prototype.push = function (socket) {
     //断开连接
     socket.on('disconnect', function () {
         // 如果有房间id的，去房间内断开，如果没有,直接清除
-        if(socket.room){
+        if (socket.room) {
             var room = that.getRoomByTD(socket.room);
-            if(room){
+            if (room) {
                 room.remove(socket);
                 //房间内元素为0,销毁房间
-                if(room.length == 0){
+                if (room.length == 0) {
                     room.destroy();
                     delete that.roomList[room.td];
                 }
@@ -75,7 +77,7 @@ UUABCMany.prototype.push = function (socket) {
 
         //移除列表中 socket
         delete that.clients[socket.id];
-        console.log('-------- disconnect -----------', socket.room, socket.id);
+        console.log(socket.room, '-------- disconnect -----------', socket.id);
     });
 
     //错误

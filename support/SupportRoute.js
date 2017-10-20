@@ -1,3 +1,6 @@
+var log4js = require('./../conf/Logger');
+var console = log4js.getLogger();
+
 module.exports = SupportRoute;
 
 function SupportRoute(scServer) {

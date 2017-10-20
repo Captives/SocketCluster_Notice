@@ -2,6 +2,8 @@ var fs = require('fs');
 var argv = require('minimist')(process.argv.slice(2));
 var SocketCluster = require('socketcluster').SocketCluster;
 var scHotReboot = require('sc-hot-reboot');
+var log4js = require('./conf/Logger');
+var console = log4js.getLogger('index');
 
 var workerControllerPath = argv.wc || process.env.SOCKETCLUSTER_WORKER_CONTROLLER;
 var brokerControllerPath = argv.bc || process.env.SOCKETCLUSTER_BROKER_CONTROLLER;
@@ -11,7 +13,7 @@ var environment = process.env.ENV || 'dev';
 var options = {
     workers: Number(argv.w) || Number(process.env.SOCKETCLUSTER_WORKERS) || 8,
     brokers: Number(argv.b) || Number(process.env.SOCKETCLUSTER_BROKERS) || 4,
-    port: Number(argv.p) || Number(process.env.SOCKETCLUSTER_PORT) || 1443,
+    port: Number(argv.p) || Number(process.env.SOCKETCLUSTER_PORT) || 6443,
     //如果您的系统不支持“uws”，可以切换到'ws'（但工作在旧系统这是较慢的）。
     wsEngine: process.env.SOCKETCLUSTER_WS_ENGINE || 'uws',
     appName: argv.n || process.env.SOCKETCLUSTER_APP_NAME || null,
@@ -32,7 +34,7 @@ var options = {
     protocol:"https",
     protocolOptions: {
         key:  fs.readFileSync('conf/uuabc_com.key'),
-        cert: fs.readFileSync('conf/uuabc_com.crt'),
+        cert: fs.readFileSync('conf/uuabc_com_bundle.crt'),
         passphrase: 'passphase4privkey'
     }
 };

@@ -1,6 +1,8 @@
 /**
  * Created by Administrator on 2017/4/28.
  */
+var log4js = require('./../conf/Logger');
+var console = log4js.getLogger();
 //教室对象
 var Room = require('./SupportRoom');
 module.exports = UUABCMany;

@@ -12,10 +12,51 @@ const mysql = {
     database : 'nodejs'
 };
 
+//日志是否控制台输出
+var logStdout = true;
+/**
+ * 日志输出配置
+ * @type
+ */
+var logconfig = {
+    console: {type: 'console'},
+    index: { type: 'console'},
+    one: {
+        type: 'dateFile',
+        filename: 'logs/',
+        alwaysIncludePattern: true,
+        pattern: "yyyyMM/one/yyyyMMdd.log"
+    },
+    many: {
+        type: 'dateFile',
+        filename: 'logs/',
+        alwaysIncludePattern: true,
+        pattern: "yyyyMM/more/yyyyMMdd.log"
+    },
+    live: {
+        type: 'dateFile',
+        filename: 'logs/',
+        alwaysIncludePattern: true,
+        pattern: "yyyyMM/live/yyyyMMdd.log"
+    },
+    search: {
+        type: 'dateFile',
+        filename: 'logs/',
+        alwaysIncludePattern: true,
+        pattern: "yyyyMM/search.log"
+    },
+    other: {
+        type: 'dateFile',
+        filename: 'logs/',
+        alwaysIncludePattern: true,
+        pattern: "yyyyMM/other.log"
+    }
+};
+
 module.exports = {
     UserType:UserType,
     api:api,
-    sql:mysql
+    sql:mysql,
+    logStdout:logStdout,
+    logAppenders:logconfig,
 };
-
-

@@ -4,6 +4,8 @@ var serveStatic = require('serve-static');
 var path = require('path');
 var morgan = require('morgan');
 var healthChecker = require('sc-framework-health-check');
+var log4js = require('./conf/Logger');
+var console = log4js.getLogger('index');
 
 module.exports.run = function (worker) {
     console.log('   >> Worker PID:', process.pid);

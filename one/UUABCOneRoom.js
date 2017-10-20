@@ -6,8 +6,8 @@ var EventEmitter = require('wolfy87-eventemitter');
 var Client = require('./UUABCOneClient').Client;
 var ClientState = require('./UUABCOneClient').ClientState;
 
-var UserType = require('./../conf/conf').UserType;
 var Device = require('./../resource/utils').Device;
+var UserType = require('./../conf/conf').UserType;
 
 var log4js = require('./../conf/Logger');
 var console = log4js.getLogger('one');
@@ -65,7 +65,7 @@ UUABCOneRoom.prototype.add = function (socket, data) {
     var device = new Device(data.ua);
     client.device = device.info();
     var dev = device.device;
-    if (dev.type && (dev.type == 'mobile' || dev.type == 'tablet')) {//移动设备
+    if (dev.type && ['mobile','tablet'].indexOf(dev.type) !=-1) {//移动设备
         this.checkLogin(client);
     } else {//电脑端限制
         var bw = device.browser;
@@ -79,6 +79,7 @@ UUABCOneRoom.prototype.add = function (socket, data) {
             this.checkLogin(client);
         }
     }
+    console.log(this.td, client.toString(), client.device, client.address);
 };
 
 /**
@@ -105,7 +106,7 @@ UUABCOneRoom.prototype.checkLogin = function (client) {
     var that = this;
     //查询相同身份的用户client对象
     var list = this.searchClient(client);
-    console.log("检查登陆,已登入连接数：", list.length + "/" + this.clients.length, client.toString());
+    console.log(this.td, "相同身份连接数：", list.length, client.toString());
     if (list.length > 0) {
         //家长监控添加接入次数限制
         if (client.userType == UserType.PAR) {
@@ -138,7 +139,7 @@ UUABCOneRoom.prototype.online = function (client) {
     this.clients.push(client);
     var list = [];
     this.clients.forEach(function (item) {
-        if(item.state == ClientState.ACTIVE){
+        if (item.state == ClientState.ACTIVE) {
             list.push({
                 id: item.id,
                 user: item.user,
@@ -177,14 +178,12 @@ UUABCOneRoom.prototype.attach = function (client) {
     });
 
     //课程结束
-    client.on('complete', function (userType, time) {
+    client.on('complete', function (userType, data, time) {
         if (userType == UserType.TEACHER) {
             that.finished = true;
-            that.getStudentInfo(client, function (value) {
-                that.clients.forEach(function (item) {
-                    item.classOver(client, value, time);
-                    console.log(that.td, "已经下课", item.toString());
-                });
+            that.clients.forEach(function (item) {
+                item.classOver(client, data, time);
+                console.log(that.td, "已经下课", data, item.toString());
             });
         }
     });
@@ -199,7 +198,7 @@ UUABCOneRoom.prototype.remove = function (socket) {
     var that = this;
     this.clients.forEach(function (item, index) {
         var status = item.search(socket);//客户端查询
-        if(status){ //匹配成功
+        if (status) { //匹配成功
             that.removeClient(item);
             console.log(that.td, '依据Socket移除Client', index, item.id);
         }
@@ -216,11 +215,11 @@ UUABCOneRoom.prototype.removeClient = function (client) {
     var that = this;
     client.state = ClientState.DISABLED;
     this.clients.forEach(function (item, index) {
-        if(item.state == ClientState.ACTIVE){
+        if (item.state == ClientState.ACTIVE) {
             item.userQuit(client);
         }
 
-        if(item.state == ClientState.DISABLED){
+        if (item.state == ClientState.DISABLED) {
             that.clients.splice(index, 1);//删除多余的客户端
             console.log(that.td, 'Client移除Client', client.toString());
         }

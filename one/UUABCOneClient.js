@@ -1,10 +1,10 @@
 var EventEmitter = require('wolfy87-eventemitter');
+
 var log4js = require('./../conf/Logger');
 var console = log4js.getLogger('one');
 
 /**状态**/
 const ClientState = {NORMAL: "normal", INACTIVE: 'inactive', ACTIVE: 'active', DISABLED: 'disabled'};
-
 module.exports = {
     Client: UUABCOneClient,
     ClientState: ClientState,
@@ -78,9 +78,9 @@ function UUABCOneClient(ws, us) {
     Object.defineProperties(this, {
         id: {//只读
             get: function () {
-                if(_socket){
+                if (_socket) {
                     return _socket.id;
-                }else{
+                } else {
                     return null;
                 }
             }
@@ -266,9 +266,9 @@ UUABCOneClient.prototype.attach = function (socket) {
     socket.on('complete', function (data, response) {
         var time = Date.now();
         if (that.state == ClientState.ACTIVE) {
-            that.emit('complete', that.userType, time);
+            that.emit('complete', that.userType, data, time);
             response({time: time, info: 'success'});
-        }else{
+        } else {
             response({time: time, info: 'The current user is offline'});
         }
     });
