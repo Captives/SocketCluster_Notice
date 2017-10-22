@@ -15,7 +15,7 @@ var options = {
     brokers: Number(argv.b) || Number(process.env.SOCKETCLUSTER_BROKERS) || 4,
     port: Number(argv.p) || Number(process.env.SOCKETCLUSTER_PORT) || 6443,
     //如果您的系统不支持“uws”，可以切换到'ws'（但工作在旧系统这是较慢的）。
-    wsEngine: process.env.SOCKETCLUSTER_WS_ENGINE || 'uws',
+    wsEngine: process.env.SOCKETCLUSTER_WS_ENGINE || 'ws',
     appName: argv.n || process.env.SOCKETCLUSTER_APP_NAME || null,
     workerController: workerControllerPath || __dirname + '/worker.js',
     brokerController: brokerControllerPath || __dirname + '/broker.js',
